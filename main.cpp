@@ -272,60 +272,79 @@ template<typename T> int Stack<T>::size() { return list.size(); }
 
 template<typename T> bool Stack<T>::empty() { return list.empty(); }
 
-//Class HashTablet
-template<typename T>
-class HashTable{
-    private:
-        List<T>[] t;
-    public:
-        HashTable(List<T>[] t) {} //n sei se e assim q faz o construtor
-        void insert(Key key, T item);
-        bool remove(Key key);
-        bool search(Key key, T item);
-        int lenght();
-        bool empty();
-        int loadFactor();
-        int hash(Key key);
+//Classe HashTable
+template<typename Key, typename T> 
+class HashTable<Key, T> {
+private:
+    int M = 11; //n sei se e pra botar tamanho na tabela, esse slida ta confuso
+    List<T>* t;
+
+public:
+    HashTable(int m = 11); //n sei se e assim q faz o construtor
+    ~HashTable();
+
+    void insert(Key key, T item);
+    bool remove(Key key);
+    bool search(Key key, T item);
+    int lenght();
+    bool empty();
+    int loadFactor();
+    int hash(Key key);
 };
 
-template<typename T>
-HashTable<T>::HashTable(List<T>[] t){
+template<typename Key, typename T>
+HashTable<Key, T>::HashTable(int m){
+    capacity = m;
+    t = new List<T>[capacity];
+}
+
+template<typename Key, typename T>
+HashTable<Key, T>::~HashTable(){
+    delete[] t;
+}
+
+template<typename Key, typename T>
+void HashTable<Key, T>::insert(Key key, T item){
     //:3
 }
 
-template<typename T>
-void HashTable<T>::insert(Key key, T item){
-    //n sei oq faz
-}
-
-template<typename T>
-bool HashTable<T>::remove(Key key){
-    //aff
-}
-
-template<typename T>
-bool HashTable<T>::search(Key key, T item){
-    //aff
-}
-
-template<typename T>
-int HashTable<T>::lenght(){
+template<typename Key, typename T>
+bool HashTable<Key, T>::remove(Key key){
     //:3
 }
 
-template<typename T>
-bool HashTable<T>::empty(){
-    //:D
+template<typename Key, typename T>
+bool HashTable<Key, T>::search(Key key, T item){
+    //:3
 }
 
-template<typename T>
-int HashTable<T>::loadFactor(){
-    //:p
+template<typename Key, typename T>
+int HashTable<Key, T>::lenght(){
+    int total_lenght = 0;
+    for (int i = 0; i < capacity; i++){
+        total += t[i].size()
+    }
 }
 
-template<typename T>
-int HashTable<T>::hash(){
-    //x_X
+template<typename Key, typename T>
+bool HashTable<Key, T>::empty(){
+    for(int i=0; i < capacity; i++){
+        if(!t){
+            return false;
+        }else{
+            return true;
+        }
+    }
+}
+
+template<typename Key, typename T>
+int HashTable<Key, T>::loadFactor(){
+    return lenght() / capacity;
+}
+
+template<typename Key, typename T>
+int HashTable<Key, T>::hash(Key key){
+    return key % capacity;
 }
 
 
