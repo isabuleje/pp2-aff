@@ -272,15 +272,16 @@ template<typename T> int Stack<T>::size() { return list.size(); }
 
 template<typename T> bool Stack<T>::empty() { return list.empty(); }
 
+/*
 //Classe HashTable
 template<typename Key, typename T> 
 class HashTable<Key, T> {
 private:
-    int M = 11; //n sei se e pra botar tamanho na tabela, esse slida ta confuso
+    const int tam = 11; //n sei se e pra botar tamanho na tabela, esse slide ta confuso
     List<T>* t;
 
 public:
-    HashTable(int m = 11); //n sei se e assim q faz o construtor
+    HashTable(const int tam); //n sei se e assim q faz o construtor
     ~HashTable();
 
     void insert(Key key, T item);
@@ -293,8 +294,8 @@ public:
 };
 
 template<typename Key, typename T>
-HashTable<Key, T>::HashTable(int m){
-    capacity = m;
+HashTable<Key, T>::HashTable(const int tam){
+    capacity = tam;
     t = new List<T>[capacity];
 }
 
@@ -346,7 +347,7 @@ template<typename Key, typename T>
 int HashTable<Key, T>::hash(Key key){
     return key % capacity;
 }
-
+*/
 
 
 
@@ -372,13 +373,13 @@ int HashTable<Key, T>::hash(Key key){
 
 /*
 
-Leitor de Codigo NEE e suas funcoes auxiliares
+Leitor de Codigo e suas funcoes auxiliares
 trim() - remove espacos em branco do inicio e do fim de uma string
-isNEEfunction() - verifica se a linha e uma funcao NEE
-isNEEend() - verifica se a linha e o fim de uma funcao NEE
-isNEEmainfunction() - verifica se a linha e a funcao principal NEE
-findMainFuction() - encontra a funcao principal NEE
-NEEexecutionStacker() - executa o leitor de codigo NEE e imprime os resultados
+isCodeFunction() - verifica se a linha e uma funcao
+isCodeEnd() - verifica se a linha e o fim de uma funcao
+isMainFunction() - verifica se a linha e a funcao principal
+findMainFuction() - encontra a funcao principal
+codeExecutionStacker() - executa o leitor de codigo e imprime os resultados
 
 */
 string trim(string str) 
@@ -395,26 +396,26 @@ string trim(string str)
     return str.substr(start, end - start + 1);
 }
 
-bool isNEEfunction(string line) 
+bool isCodeFunction(string line) 
 {
     line = trim(line);
     return (line.size() == 1 || (line.size() > 1 && line[1] != ':'));
 }
 
-bool isNEEend(string line) 
+bool isFunctionEnd(string line) 
 {
     return line == "" || line == " " || line.empty();
 }
 
 
-void NEEprint(Stack<string> print_list) 
+void printSecretCode(Stack<string> phrase_letters) 
 {
     List<string> temporary;
     Stack<string> temp(temporary);
 
-    while (!print_list.empty()) {
-      temp.push(print_list.top());
-      print_list.pop();
+    while (!phrase_letters.empty()) {
+      temp.push(phrase_letters.top());
+      phrase_letters.pop();
     }
 
     while(!temp.empty()){
@@ -425,7 +426,7 @@ void NEEprint(Stack<string> print_list)
 
 }
 
-bool isNEEmainfunction(string line) {
+bool isCodeMainfunction(string line) {
     return (line == "Z :");
 }
 
@@ -435,7 +436,7 @@ void findMainFuction(ListNavigator<string>& nav){
     while (!nav.end()) {
         nav.getCurrentItem(line);
         line = trim(line);
-        if (isNEEmainfunction(line)) {
+        if (isCodeMainfunction(line)) {
             nav.next();
             return;
         }
@@ -443,9 +444,9 @@ void findMainFuction(ListNavigator<string>& nav){
     }
 
 }
-bool executeFunctionByName(string functionName, List<string> codeList, Stack<string>& print_list);
+bool executeFunctionByName(string functionName, List<string> codeList, Stack<string>& phrase_letters);
 
-void processFunctionBody(ListNavigator<string>& nav, Stack<string>& print_list, List<string>& codeList){
+void processFunctionBody(ListNavigator<string>& nav, Stack<string>& phrase_letters, List<string>& codeList){
     string line;
 
     while (!nav.end()) {
@@ -456,17 +457,18 @@ void processFunctionBody(ListNavigator<string>& nav, Stack<string>& print_list, 
           break;  
       }
 
-      if (line.find("PRINT") != string::npos) {
-          print_list.push(line);
+      if (line.find("ENFILERA")) {
+        phrase_letters.push(line);
+        executeFunctionByName(line, codeList, phrase_letters);
       }
-      else if (isNEEfunction(line)) {
-        executeFunctionByName(line, codeList, print_list);
+      else if (line.find("DESENFILERA")){
+        phrase_letters.pop();
       }
       nav.next();
     }
 }
 
-bool executeFunctionByName(string functionName, List<string> codeList, Stack<string>& print_list){
+bool executeFunctionByName(string functionName, List<string> codeList, Stack<string>& phrase_letters){
     ListNavigator<string> nav = codeList.getListNavigator();
     string line;
 
@@ -475,7 +477,7 @@ bool executeFunctionByName(string functionName, List<string> codeList, Stack<str
         line = trim(line);
         if (line == functionName + " :") {
             nav.next();
-            processFunctionBody(nav, print_list, codeList);
+            processFunctionBody(nav, phrase_letters, codeList);
             return true;
         }
         nav.next();
@@ -485,27 +487,15 @@ bool executeFunctionByName(string functionName, List<string> codeList, Stack<str
 }
 
 
-void NEEexecutionStacker(List<string> codeList) {
-    /*
-    Acho que o ideal e tipo, PRINTAR e se surgir uma chamada de funcao, entra pra executar essa funcao e depois volta pra funcao anterior. Mas nao sei como fazer isso PwP
-
-    Tudo em funcoes bonitinhas :3
-    Tentei mexer mas o maximo que eu consegui foi colocar os primeiros 8 numeros iguais no output aff
-    Para dar sorte e melhorar o animo
-
-                                      .-.
-     (___________________________()6 `-,
-     (   ______________________   /''"`
-     //\\                      //\\
-     "" ""                     "" ""
-*/
-    List<string> list_prints;
-    Stack<string> print_list(list_prints);
+void codeExecutionStacker(List<string> codeList) {
+    List<string> secret_phrase;
+    Stack<string> phrase_letters(secret_phrase); 
     ListNavigator<string> nav = codeList.getListNavigator();
 
-    findMainFuction(nav); // Encontra a funcao principal NEE
-    processFunctionBody(nav,print_list, codeList); 
-    NEEprint(print_list);
+    findMainFuction(nav);
+    processFunctionBody(nav,phrase_letters, codeList);
+
+    printSecretCode(phrase_letters);
 }
 
 int main() {
@@ -516,15 +506,31 @@ int main() {
       codeList.insertBack(line);
     }
 
-    NEEexecutionStacker(codeList);
+    codeExecutionStacker(codeList);
 
     return 0;
 }
 
-// deu certo vou chorar
-// Nao precisa vir aqui: apenas gatinhos
-/*
-    |\__/,|   (`\
-  _.|o o  |_   ) )
--(((---(((--------
-*/
+/*C :
+ENFILEIRA T
+ENFILEIRA A
+ENFILEIRA Q
+A :
+ENFILEIRA A
+C
+DESENFILEIRA
+DESENFILEIRA
+ENFILEIRA U
+B :
+ENFILEIRA A
+ENFILEIRA T
+DESENFILEIRA
+A
+Z :
+ENFILEIRA X
+ENFILEIRA Q
+B
+ENFILEIRA E
+DESENFILEIRA
+
+2~*/
