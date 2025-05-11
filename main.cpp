@@ -197,6 +197,7 @@ template<typename T> bool ListNavigator<T>::getCurrentItem(T &item)
 
 template<typename T> int ListNavigator<T>::getCurrentPosition() const { return currentPosition; }
 
+//Class Queue
 template<typename T> class Queue {
 private:
     List<T> list;
@@ -219,7 +220,7 @@ template<typename T> void Queue<T>::dequeue()
     if (empty()) {
       cout << "Queue is empty" << endl;
     }
-    list.removeBack();
+    list.removeFront();
 }
 
 template<typename T> T Queue<T>::front() 
@@ -227,7 +228,7 @@ template<typename T> T Queue<T>::front()
     if (empty()) {
       return T();
     }
-    return list.getItemBack();
+    return list.getItemFront();
 }
 
 template<typename T> int Queue<T>::size() { return list.size(); }
@@ -245,6 +246,7 @@ public:
     T top();
     int size();
     bool empty();
+    bool contains(T item);
     Stack(List<T>);
 };
 
@@ -271,6 +273,19 @@ template<typename T> T Stack<T>::top()
 template<typename T> int Stack<T>::size() { return list.size(); }
 
 template<typename T> bool Stack<T>::empty() { return list.empty(); }
+
+template <typename T>
+bool Stack<T>::contains(T item) {
+    ListNavigator<T> nav = list.getListNavigator();
+    T currentItem;
+    while (!nav.end()) {
+        if (nav.getCurrentItem(currentItem) && currentItem == item) {
+            return true;
+        }
+        nav.next();
+    }
+    return false;
+}
 
 /*
 //Classe HashTable
@@ -399,7 +414,7 @@ string trim(string str)
 bool isCodeFunction(string line) 
 {
     line = trim(line);
-    return (line.size() == 1 || (line.size() > 1 && line[1] != ':'));
+    return (line.size() == 1 || (line.size() > 1 && line[1] != ':' ) ) ;
 }
 
 bool isFunctionEnd(string line) 
@@ -408,22 +423,13 @@ bool isFunctionEnd(string line)
 }
 
 
-void printSecretCode(Stack<string> phrase_letters) 
-{
-    List<string> temporary;
-    Stack<string> temp(temporary);
-
-    while (!phrase_letters.empty()) {
-      temp.push(phrase_letters.top());
-      phrase_letters.pop();
+void printSecretCode(Queue<string> lettersQueue) 
+{    
+    while (!lettersQueue.empty()) {
+        cout << lettersQueue.front();
+        lettersQueue.dequeue();
     }
-
-    while(!temp.empty()){
-      string item = temp.top();
-      cout << item.substr(6) << " ";
-      temp.pop();
-    }
-
+    cout << endl;
 }
 
 bool isCodeMainfunction(string line) {
@@ -444,31 +450,47 @@ void findMainFuction(ListNavigator<string>& nav){
     }
 
 }
-bool executeFunctionByName(string functionName, List<string> codeList, Stack<string>& phrase_letters);
+bool executeFunctionByName(string functionName, List<string>& codeList, Queue<string>& lettersQueue, Stack<string>& callStack);
 
-void processFunctionBody(ListNavigator<string>& nav, Stack<string>& phrase_letters, List<string>& codeList){
+void processFunctionBody(ListNavigator<string>& nav, Queue<string>& lettersQueue, List<string>& codeList, Stack<string>& callStack) {
     string line;
 
     while (!nav.end()) {
-      nav.getCurrentItem(line);
-      line = trim(line);
+        nav.getCurrentItem(line);
+        line = trim(line);
 
-      if (line == "~" || line.empty() ){
-          break;  
-      }
+        if (line == "~" || line.empty()) {
+            break;  
+        }
 
-      if (line.find("ENFILERA")) {
-        phrase_letters.push(line);
-        executeFunctionByName(line, codeList, phrase_letters);
-      }
-      else if (line.find("DESENFILERA")){
-        phrase_letters.pop();
-      }
-      nav.next();
+    
+        if (line.find("DESENFILEIRA") != string::npos) {
+            if (!lettersQueue.empty()) {
+                string value = lettersQueue.front();
+                cout << "DESENFILEIRA: " << value << endl;
+                lettersQueue.dequeue();
+            }
+        }
+        else if (line.find("ENFILEIRA") != string::npos) {
+                string character = line.substr(line.find("ENFILEIRA") + 9);
+                character = trim(character);
+                lettersQueue.enqueue(character);
+                cout << "ENFILEIRA: " << character << endl;
+            }
+        else if (isCodeFunction(line)) {
+            if (callStack.contains(line)) {
+                cerr << "Ta repetindor na funcaor " << line << endl;
+                return;
+            }
+            callStack.push(line);
+            executeFunctionByName(line, codeList, lettersQueue, callStack);
+            callStack.pop();
+        }
+        nav.next();
     }
 }
 
-bool executeFunctionByName(string functionName, List<string> codeList, Stack<string>& phrase_letters){
+bool executeFunctionByName(string functionName, List<string>& codeList, Queue<string>& lettersQueue, Stack<string>& callStack) {
     ListNavigator<string> nav = codeList.getListNavigator();
     string line;
 
@@ -477,25 +499,27 @@ bool executeFunctionByName(string functionName, List<string> codeList, Stack<str
         line = trim(line);
         if (line == functionName + " :") {
             nav.next();
-            processFunctionBody(nav, phrase_letters, codeList);
+            processFunctionBody(nav, lettersQueue, codeList, callStack);
             return true;
         }
         nav.next();
     }
     return false;
-
 }
 
-
 void codeExecutionStacker(List<string> codeList) {
-    List<string> secret_phrase;
-    Stack<string> phrase_letters(secret_phrase); 
+    List<string> queueList;
+    Queue<string> lettersQueue(queueList);
+    
+    List<string> callList;
+    Stack<string> callStack(callList);
+
     ListNavigator<string> nav = codeList.getListNavigator();
 
-    findMainFuction(nav);
-    processFunctionBody(nav,phrase_letters, codeList);
+    findMainFuction(nav); 
+    processFunctionBody(nav, lettersQueue, codeList, callStack); 
 
-    printSecretCode(phrase_letters);
+    printSecretCode(lettersQueue);
 }
 
 int main() {
@@ -511,26 +535,27 @@ int main() {
     return 0;
 }
 
-/*C :
-ENFILEIRA T
-ENFILEIRA A
-ENFILEIRA Q
+/*
+C :
+    ENFILEIRA T
+    ENFILEIRA A
+    ENFILEIRA Q
 A :
-ENFILEIRA A
-C
-DESENFILEIRA
-DESENFILEIRA
-ENFILEIRA U
+    ENFILEIRA A
+    C
+    DESENFILEIRA
+    DESENFILEIRA
+    ENFILEIRA U
 B :
-ENFILEIRA A
-ENFILEIRA T
-DESENFILEIRA
-A
+    ENFILEIRA A
+    ENFILEIRA T
+    DESENFILEIRA
+    A
 Z :
-ENFILEIRA X
-ENFILEIRA Q
-B
-ENFILEIRA E
-DESENFILEIRA
-
-2~*/
+    ENFILEIRA X
+    ENFILEIRA Q
+    B
+    ENFILEIRA E
+    DESENFILEIRA
+~
+*/
