@@ -450,7 +450,7 @@ void findMainFuction(ListNavigator<string>& nav){
     }
 
 }
-bool executeFunctionByName(string functionName, List<string>& codeList, Queue<string>& lettersQueue, Stack<string>& callStack);
+bool executeFunctionByName(string functionName, List<string> codeList, Queue<string>& lettersQueue, Stack<string>& callStack);
 
 void processFunctionBody(ListNavigator<string>& nav, Queue<string>& lettersQueue, List<string>& codeList, Stack<string>& callStack) {
     string line;
@@ -479,18 +479,20 @@ void processFunctionBody(ListNavigator<string>& nav, Queue<string>& lettersQueue
             }
         else if (isCodeFunction(line)) {
             if (callStack.contains(line)) {
-                cerr << "Ta repetindor na funcaor " << line << endl;
+                cout << "Ta repetindor na funcaor " << line << endl;
                 return;
             }
+            
             callStack.push(line);
             executeFunctionByName(line, codeList, lettersQueue, callStack);
             callStack.pop();
         }
         nav.next();
     }
+    
 }
 
-bool executeFunctionByName(string functionName, List<string>& codeList, Queue<string>& lettersQueue, Stack<string>& callStack) {
+bool executeFunctionByName(string functionName, List<string> codeList, Queue<string>& lettersQueue, Stack<string>& callStack) {
     ListNavigator<string> nav = codeList.getListNavigator();
     string line;
 
@@ -498,12 +500,16 @@ bool executeFunctionByName(string functionName, List<string>& codeList, Queue<st
         nav.getCurrentItem(line);
         line = trim(line);
         if (line == functionName + " :") {
+            cout << "chama" << line << endl;
             nav.next();
+            callStack.push(line);
             processFunctionBody(nav, lettersQueue, codeList, callStack);
+            callStack.pop();
             return true;
         }
         nav.next();
     }
+    
     return false;
 }
 
@@ -535,6 +541,8 @@ int main() {
     return 0;
 }
 
+
+
 /*
 C :
     ENFILEIRA T
@@ -559,3 +567,4 @@ Z :
     DESENFILEIRA
 ~
 */
+//ULTIMO ERRO TA LENDO A FUNCAO Z DUAS VEZES DO ZERO
