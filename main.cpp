@@ -436,13 +436,14 @@ bool isCodeMainfunction(string line) {
     return (line == "Z :");
 }
 
-void findMainFuction(ListNavigator<string>& nav){
+void findMainFuction(ListNavigator<string>& nav, Stack<string> callStack){
     string line;
 
     while (!nav.end()) {
         nav.getCurrentItem(line);
         line = trim(line);
         if (isCodeMainfunction(line)) {
+            callStack.push(line);
             nav.next();
             return;
         }
@@ -450,7 +451,7 @@ void findMainFuction(ListNavigator<string>& nav){
     }
 
 }
-bool executeFunctionByName(string functionName, List<string> codeList, Queue<string>& lettersQueue, Stack<string>& callStack);
+bool executeFunctionByName(string functionName, List<string>& codeList, Queue<string>& lettersQueue, Stack<string>& callStack);
 
 void processFunctionBody(ListNavigator<string>& nav, Queue<string>& lettersQueue, List<string>& codeList, Stack<string>& callStack) {
     string line;
@@ -492,7 +493,7 @@ void processFunctionBody(ListNavigator<string>& nav, Queue<string>& lettersQueue
     
 }
 
-bool executeFunctionByName(string functionName, List<string> codeList, Queue<string>& lettersQueue, Stack<string>& callStack) {
+bool executeFunctionByName(string functionName, List<string>& codeList, Queue<string>& lettersQueue, Stack<string>& callStack) {
     ListNavigator<string> nav = codeList.getListNavigator();
     string line;
 
@@ -522,7 +523,7 @@ void codeExecutionStacker(List<string> codeList) {
 
     ListNavigator<string> nav = codeList.getListNavigator();
 
-    findMainFuction(nav); 
+    findMainFuction(nav, callStack); 
     processFunctionBody(nav, lettersQueue, codeList, callStack); 
 
     printSecretCode(lettersQueue);
@@ -567,4 +568,5 @@ Z :
     DESENFILEIRA
 ~
 */
-//ULTIMO ERRO TA LENDO A FUNCAO Z DUAS VEZES DO ZERO
+
+//mds deu certo...
