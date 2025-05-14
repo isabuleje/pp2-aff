@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <list>
 
 using namespace std;
 
@@ -292,7 +293,7 @@ bool Stack<T>::contains(T item) {
 template<typename Key, typename T> 
 class HashTable<Key, T> {
 private:
-    List<T>* t;
+    List<T>* table;
 
 public:
     HashTable(const int capacity); //n sei se e assim q faz o construtor
@@ -309,7 +310,6 @@ public:
 
 template<typename Key, typename T>
 HashTable<Key, T>::HashTable(const int capacity){
-    this.capacity = capacity;
     table = new List<T>[capacity];
 }
 
@@ -320,17 +320,27 @@ HashTable<Key, T>::~HashTable(){
 
 template<typename Key, typename T>
 void HashTable<Key, T>::insert(Key key, T item){
-    //:3
+    int index = hash(key);
+    table[index].push_back(key, item); //é pushback ou insert aq eu achor
 }
 
 template<typename Key, typename T>
 bool HashTable<Key, T>::remove(Key key){
-    //:3
+    int index = hash(key);
+
+
 }
 
 template<typename Key, typename T>
 bool HashTable<Key, T>::search(Key key, T item){
-    //:3
+    int index = hash(key);
+    for (int i = 0; i < table[index]; i++) {
+        if (table[index][i] == key) {
+            cout << key << " found at index " << i << endl;
+            return true;
+        }
+    }
+    cout << key << " not found" << endl;
 }
 
 template<typename Key, typename T>
@@ -343,8 +353,8 @@ int HashTable<Key, T>::lenght(){
 
 template<typename Key, typename T>
 bool HashTable<Key, T>::empty(){
-    for(int i=0; i < capacity; i++){
-        if(!t){
+    for(int i=0; i < table->capacity; i++){
+        if(!table){
             return false;
         }else{
             return true;
@@ -354,13 +364,13 @@ bool HashTable<Key, T>::empty(){
 
 template<typename Key, typename T>
 int HashTable<Key, T>::loadFactor(){
-    return lenght() / capacity;
+    return lenght() / table->capacity;
 }
 
 //Transforma a chave para um index da tabela
 template<typename Key, typename T>
 int HashTable<Key, T>::hash(Key key){
-    return key % capacity;
+    return (key % table->capacity);
 }
 
 
