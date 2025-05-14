@@ -287,16 +287,15 @@ bool Stack<T>::contains(T item) {
     return false;
 }
 
-/*
+
 //Classe HashTable
 template<typename Key, typename T> 
 class HashTable<Key, T> {
 private:
-    const int tam = 11; //n sei se e pra botar tamanho na tabela, esse slide ta confuso
     List<T>* t;
 
 public:
-    HashTable(const int tam); //n sei se e assim q faz o construtor
+    HashTable(const int capacity); //n sei se e assim q faz o construtor
     ~HashTable();
 
     void insert(Key key, T item);
@@ -309,14 +308,14 @@ public:
 };
 
 template<typename Key, typename T>
-HashTable<Key, T>::HashTable(const int tam){
-    capacity = tam;
-    t = new List<T>[capacity];
+HashTable<Key, T>::HashTable(const int capacity){
+    this.capacity = capacity;
+    table = new List<T>[capacity];
 }
 
 template<typename Key, typename T>
 HashTable<Key, T>::~HashTable(){
-    delete[] t;
+    delete[] table;
 }
 
 template<typename Key, typename T>
@@ -358,11 +357,11 @@ int HashTable<Key, T>::loadFactor(){
     return lenght() / capacity;
 }
 
+//Transforma a chave para um index da tabela
 template<typename Key, typename T>
 int HashTable<Key, T>::hash(Key key){
     return key % capacity;
 }
-*/
 
 
 
@@ -383,6 +382,7 @@ int HashTable<Key, T>::hash(Key key){
 
 
 
+//NAO MEXE AQ PRA BAIXO Q TA PRONTO D:
 
 
 
