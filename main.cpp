@@ -288,7 +288,8 @@ bool Stack<T>::contains(T item) {
     return false;
 }
 
-
+//so deus sabe se ta certo ou completamente errado
+//tem que ver como o prof botou no slide dps
 //Classe HashTable
 template<typename Key, typename T> 
 class HashTable<Key, T> {
@@ -310,7 +311,9 @@ public:
 
 template<typename Key, typename T>
 HashTable<Key, T>::HashTable(const int capacity){
+    capacity = capacity;
     table = new List<T>[capacity];
+    count = 0;
 }
 
 template<typename Key, typename T>
@@ -321,14 +324,13 @@ HashTable<Key, T>::~HashTable(){
 template<typename Key, typename T>
 void HashTable<Key, T>::insert(Key key, T item){
     int index = hash(key);
-    table[index].push_back(key, item); //é pushback ou insert aq eu achor
+    table[index].insert(item);
+    count++;
 }
 
 template<typename Key, typename T>
 bool HashTable<Key, T>::remove(Key key){
     int index = hash(key);
-
-
 }
 
 template<typename Key, typename T>
@@ -345,43 +347,42 @@ bool HashTable<Key, T>::search(Key key, T item){
 
 template<typename Key, typename T>
 int HashTable<Key, T>::lenght(){
-    int total_lenght = 0;
-    for (int i = 0; i < capacity; i++){
-        total += t[i].size()
-    }
+    return count;
 }
 
 template<typename Key, typename T>
 bool HashTable<Key, T>::empty(){
-    for(int i=0; i < table->capacity; i++){
-        if(!table){
-            return false;
-        }else{
-            return true;
-        }
-    }
-}
+    return count == 0;
 
 template<typename Key, typename T>
 int HashTable<Key, T>::loadFactor(){
-    return lenght() / table->capacity;
+    return static_cast(count) /capacity;
 }
 
-//Transforma a chave para um index da tabela
 template<typename Key, typename T>
 int HashTable<Key, T>::hash(Key key){
-    return (key % table->capacity);
+    size_t hash(const std::string& key, size_t m) {
+        size_t hashValue = 0;
+        size_t n = key.length();
+        for (size_t i = 0; i < n; ++i) {
+            hashValue += key[i] * static_cast<size_t>(std::pow(128, n - i - 1));
+            hashValue %= m;
+        }
+        return hashValue;
+    }
 }
 
 
 
+void languageTranslator(List<T>& iantecoLanguage){
+    //nao sei como é pra prosseguir
+    HashTable<char, char> hashTable;
 
 
 
 
 
-
-
+}
 
 
 
@@ -525,6 +526,15 @@ bool executeFunctionByName(string functionName, List<string>& codeList, Queue<st
 }
 
 void codeExecutionStacker(List<string> codeList) {
+    //é pra colocar o alfabeto traduzido como codeList dps
+    /*/List<string> codeList;
+        string line;
+
+        while (getline(cin, line) && line != "~") {
+          codeList.insertBack(line);
+        }
+
+        codeExecutionStacker(codeList);*/
     List<string> queueList;
     Queue<string> lettersQueue(queueList);
     
@@ -540,14 +550,13 @@ void codeExecutionStacker(List<string> codeList) {
 }
 
 int main() {
-    List<string> codeList;
-    string line;
+    List<string> iantecoLanguage;
+    string alphabet;
 
-    while (getline(cin, line) && line != "~") {
-      codeList.insertBack(line);
+    while(getline(cin, alphabet)) {
+        iantecoLanguage.insertBack(alphabet);
     }
-
-    codeExecutionStacker(codeList);
+    languageTranslator(iantecoLanguage);
 
     return 0;
 }
