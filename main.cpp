@@ -56,6 +56,7 @@ public:
     void removeFront();
     void removeBack();
     T getItemFront();
+    Node<T>* getHead();
     T getItemBack();
     ListNavigator<T> getListNavigator() const;
     int size();
@@ -93,6 +94,7 @@ template<typename T> void List<T>::insertFront(T item)
     Node<T> *pNew = new Node<T>(item);
     pNew->next = pHead->next;
     pHead->next = pNew;
+    pNew->prev = pHead;
 
     if (pBack == pHead) {
       pBack = pNew;
@@ -104,6 +106,7 @@ template<typename T> void List<T>::insertBack(T item)
 {
     Node<T> *pNew = new Node<T>(item);
     pBack->next = pNew;
+    pNew->prev = pBack;
     pBack = pNew;
     numItems++;
 }
@@ -165,6 +168,8 @@ template<typename T> ListNavigator<T> List<T>::getListNavigator() const
 template<typename T> int List<T>::size() { return numItems; }
 
 template<typename T> bool List<T>::empty() { return pBack == pHead; }
+
+template<typename T> Node<T>* List<T>::getHead() { return pHead; }
 
 // ListNavigator
 template<typename T> class ListNavigator {
@@ -360,7 +365,7 @@ Pair<T, U>::Pair(T item1, U item2) {
 template<typename T, typename U>
 Pair<T, U>::Pair() {
     first = T();
-    last = T();
+    last = U();
 }
 
 //conversor das letras aliens pra alfabeto da forma mais literal possivel
@@ -568,17 +573,14 @@ T HashTable<Key, T>::findItemFromKey(Key key) {
     long unsigned int index = hash(key);
     List<Pair<Key, T>>& target = table[index];
     cout << "index: " << index << endl;
-    ListNavigator<Pair<Key, T>> nav = target.getListNavigator();
-    cout << "nav";
-    Pair<Key, T> currentItem;
+    Node<Pair<Key, T>>* currentNode  = table[index].getHead();
     cout << "tamanho da lista: " << target.size() << endl;
     do {
-        currentItem = nav.getCurrentItem();
-        if (currentItem.getFirst() == key) {
-            return currentItem.getLast();
+        currentNode = currentNode->next;
+        if (currentNode->getItem().getFirst() == key) {
+            return currentNode->getItem().getLast();
         }
-        nav.next();
-    } while (!nav.end());
+    } while (currentNode != nullptr);
     return T();
 }
     
