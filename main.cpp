@@ -181,6 +181,7 @@ public:
     void removeCurrentItem();
     ListNavigator(Node<T> *current);
     T getCurrentItem();
+    Node<T> *getCurrentNode() { return current; }
 };
 
 template<typename T> ListNavigator<T>::ListNavigator(Node<T> *current) 
@@ -191,7 +192,11 @@ template<typename T> ListNavigator<T>::ListNavigator(Node<T> *current)
 
 template<typename T> bool ListNavigator<T>::end() { return current == nullptr; }
 
-template<typename T> void ListNavigator<T>::next() { current = current->next; }
+template<typename T> void ListNavigator<T>::next() { 
+    if (current != nullptr) {
+        current = current->next;
+    }
+}
 
 template<typename T> void ListNavigator<T>::reset() { current = start; }
 
@@ -529,17 +534,21 @@ int HashTable<Key, T>::loadFactor(){
 
 template<typename Key, typename T>
 T HashTable<Key, T>::findItemFromKey(Key key) {
+    cout << "entrou na funcao findItemFromKey" << endl;
     long unsigned int index = hash(key);
     List<Pair<Key, T>>& target = table[index];
+    cout << "index: " << index << endl;
     ListNavigator<Pair<Key, T>> nav = target.getListNavigator();
+    cout << "nav";
     Pair<Key, T> currentItem;
-    while (!nav.end()) {
+    cout << "tamanho da lista: " << target.size() << endl;
+    do {
         currentItem = nav.getCurrentItem();
         if (currentItem.getFirst() == key) {
             return currentItem.getLast();
         }
         nav.next();
-    }
+    } while (!nav.end());
     return T();
 }
     
@@ -589,6 +598,8 @@ string translateString(string str, HashTable<string, string> alienDict) {
     for (int i = 0; i < strlen; i += 3) {
         string key = str.substr(i, 3);
         string value = alienDict.findItemFromKey(key);
+        cout << "key: " << key << endl;
+        cout << "value: " << value << endl;
         result += value;
     }
 
@@ -721,7 +732,7 @@ bool executeFunctionByName(string functionName, List<string>& codeList, Queue<st
     ListNavigator<string> nav = codeList.getListNavigator();
     string line;
 
-    while (!nav.end()) {
+    while (nav.getCurrentNode()->next != nullptr && !nav.end()) {
         nav.getCurrentItem(line);
         line = trim(line);
         if (line == functionName + " :") {
