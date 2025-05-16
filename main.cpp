@@ -3,8 +3,12 @@
 #include <cstring>
 #include <iostream>
 #include <list>
+#include <cmath>
 
 using namespace std;
+
+
+
 
 // Class Node
 template<typename T> class Node {
@@ -19,14 +23,14 @@ public:
     Node(T item);
 };
 
-template<typename T> Node<T>::Node() 
-{
+template<typename T> 
+Node<T>::Node() {
     next = nullptr;
     prev = nullptr;
 }
 
-template<typename T> Node<T>::Node(T item) 
-{
+template<typename T> 
+Node<T>::Node(T item) {
     this->item = item;
     next = nullptr;
     prev = nullptr;
@@ -66,15 +70,21 @@ template<typename T> List<T>::List()
     numItems = 0;
 }
 
-template<typename T> void List<T>::succ(Node<T> *&p) { p = p->next; }
+template<typename T> void List<T>::succ(Node<T> *&p) {
+    if (p -> next == nullptr || p -> next == pBack) {
+      return;
+    } else {
+      p = p->next;
+    }
+}
 
 template<typename T> void List<T>::pred(Node<T> *&p) 
 {
-    Node<T> *q = pHead;
-    while (q->next != p) {
-      succ(q);
+    if (p -> prev == nullptr || p -> prev == pHead) {
+      return;
+    } else {
+      p = p->prev;
     }
-    p = q;
 }
 
 template<typename T> void List<T>::insertFront(T item) 
@@ -125,10 +135,6 @@ template<typename T> void List<T>::removeBack()
     pBack->next = nullptr;
 
     delete temp;
-
-    if (pHead == pBack) {
-      pHead = pBack;
-    }
     numItems--;
 }
 
@@ -172,7 +178,9 @@ public:
     void reset();
     bool getCurrentItem(T &item);
     int  getCurrentPosition() const;
+    void removeCurrentItem();
     ListNavigator(Node<T> *current);
+    T getCurrentItem();
 };
 
 template<typename T> ListNavigator<T>::ListNavigator(Node<T> *current) 
@@ -196,7 +204,19 @@ template<typename T> bool ListNavigator<T>::getCurrentItem(T &item)
     return true;
 }
 
+template<typename T> T ListNavigator<T>::getCurrentItem() { return current->getItem();}
+
 template<typename T> int ListNavigator<T>::getCurrentPosition() const { return currentPosition; }
+
+template<typename T> void ListNavigator<T>::removeCurrentItem() 
+{
+    if (current == nullptr) {
+      return;
+    }
+    current->prev->next = current->next;
+    current->next->prev = current->prev;
+    delete current;   
+}
 
 //Class Queue
 template<typename T> class Queue {
@@ -288,29 +308,149 @@ bool Stack<T>::contains(T item) {
     return false;
 }
 
-
-//Classe HashTable
-template<typename Key, typename T> 
-class HashTable<Key, T> {
+//Classe Pair
+//basicamente classe de tupla tamanho 2, professor pediu pra uma nos casos de colisao
+template<typename T, typename U>
+class Pair {
 private:
-    List<T>* table;
+    T first;
+    U last;
+public:
+    Pair(T item1, U item2);
+    Pair(T item);
+    Pair();
 
+    T getFirst() {
+        return first;
+    }
+    U getLast() {
+        return last;
+    }
+    void setAll(T item1, U item2) {
+        first = item1;
+        last = item2; 
+    }
+    void setFirst(T item) {
+        first = item;
+    }
+    void setLast(U item) {
+        last = item;
+    }
+};
+
+
+template<typename T, typename U>
+Pair<T, U>::Pair(T item) {
+    first = item;
+    last = U();
+}
+
+template<typename T, typename U>
+Pair<T, U>::Pair(T item1, U item2) {
+    first = item1;
+    last = item2;
+}
+
+template<typename T, typename U>
+Pair<T, U>::Pair() {
+    first = T();
+    last = T();
+}
+
+//conversor das letras aliens pra alfabeto da forma mais literal possivel
+//(switchcase nao funciona com string, so com char)
+//(tem alguma outra forma de fazer isso?)
+string algoritmoConcersorAlienAlfanumerico(string alien) {
+    if (alien == ":::") {
+        return "A";
+    } else if (alien == ".::") {
+        return "B";
+    } else if (alien == ":.:") {
+        return "C";
+    } else if (alien == "::.") {
+        return "D";
+    } else if (alien == ":..") {
+        return "E";
+    } else if (alien == ".:.") {
+        return "F";
+    } else if (alien == "..:") {
+        return "G";
+    } else if (alien == "...") {
+        return "H";
+    } else if (alien == "|::") {
+        return "I";
+    } else if (alien == ":|:") {
+        return "J";
+    } else if (alien == "::|") {
+        return "K";
+    } else if (alien == "|.:") {
+        return "L";
+    } else if (alien == ".|:") {
+        return "M";
+    } else if (alien == ".:|") {
+        return "N";
+    } else if (alien == "|:.") {
+        return "O";
+    } else if (alien == ":|.") {
+        return "P";
+    } else if (alien == ":.|") {
+        return "Q";
+    } else if (alien == "|..") {
+        return "R";
+    } else if (alien == ".|.") {
+        return "S";
+    } else if (alien == "..|") {
+        return "T";
+    } else if (alien == ".||") {
+        return "U";
+    } else if (alien == "|.|") {
+        return "V";
+    } else if (alien == "||.") {
+        return "W";
+    } else if (alien == "-.-") {
+        return "X";
+    } else if (alien == ".--") {
+        return "Y";
+    } else if (alien == "--.") {
+        return "Z";
+    } else if (alien == "---") {
+        return " ";
+    } else if (alien == "~") {
+        return "~";
+    } else if (alien == ":__") {
+        return "|__";
+    } else {
+        return "?";
+    }
+}
+
+
+template<typename Key, typename T> 
+class HashTable {
+private:
+    List<Pair<Key, T>> *table;
 public:
     HashTable(const int capacity); //n sei se e assim q faz o construtor
+    long unsigned int size;
+
     ~HashTable();
 
+    long unsigned int getSize();
     void insert(Key key, T item);
+    void insert(Pair<Key, T> pair); 
     bool remove(Key key);
     bool search(Key key, T item);
-    int lenght();
+    T findItemFromKey(Key key);
+    int length();
     bool empty();
     int loadFactor();
-    int hash(Key key);
+    long unsigned int hash(const Key& key);
 };
 
 template<typename Key, typename T>
 HashTable<Key, T>::HashTable(const int capacity){
-    table = new List<T>[capacity];
+    table = new List<Pair<Key, T>>[capacity];
+    size = capacity;
 }
 
 template<typename Key, typename T>
@@ -319,41 +459,61 @@ HashTable<Key, T>::~HashTable(){
 }
 
 template<typename Key, typename T>
-void HashTable<Key, T>::insert(Key key, T item){
-    int index = hash(key);
-    table[index].push_back(key, item); //é pushback ou insert aq eu achor
+long unsigned int HashTable<Key, T>::getSize(){
+    return size;
 }
 
 template<typename Key, typename T>
-bool HashTable<Key, T>::remove(Key key){
-    int index = hash(key);
+void HashTable<Key, T>::insert(Key key, T item){
+    //cout << "entrou na funcao insert" << endl;
+    long unsigned int index = hash(key);
+    cout << "index: " << index << endl;
+    table[index].insertBack(Pair<Key, T>(key, item));
+}
 
+template<typename Key, typename T>
+void HashTable<Key, T>::insert(Pair<Key, T> pair){
+    long unsigned int index = hash(pair.getFirst());
+    table[index].push(pair);
+}
 
+template<typename Key, typename T>
+bool HashTable<Key, T>::remove(Key key) {
+    long unsigned int index = hash(key);
+    List<Pair<Key, T>>& target = table[index];
+    ListNavigator<Pair<Key, T>> nav = target.getListNavigator();
+    Pair<Key, T> currentItem;
+    while (!nav.end()) {
+        currentItem = nav.getCurrentItem();
+        if (currentItem.getFirst() == key) {
+            nav.removeCurrentItem();
+            return true;
+        }
+        nav.next();
+    }
+    return false;
 }
 
 template<typename Key, typename T>
 bool HashTable<Key, T>::search(Key key, T item){
-    int index = hash(key);
-    for (int i = 0; i < table[index]; i++) {
-        if (table[index][i] == key) {
-            cout << key << " found at index " << i << endl;
+    long unsigned int index = hash(key);
+    List<Pair<Key, T>>& target = table[index];
+    ListNavigator<Pair<Key, T>> nav = target.getListNavigator();
+    Pair<Key, T> currentItem;
+    while (!nav.end()) {
+        currentItem = nav.getCurrentItem();
+        if (currentItem.getFirst() == key && currentItem.getLast() == item) {
+            cout << item << " found at index " << index << endl;
             return true;
         }
     }
     cout << key << " not found" << endl;
-}
-
-template<typename Key, typename T>
-int HashTable<Key, T>::lenght(){
-    int total_lenght = 0;
-    for (int i = 0; i < capacity; i++){
-        total += t[i].size()
-    }
+    return false;
 }
 
 template<typename Key, typename T>
 bool HashTable<Key, T>::empty(){
-    for(int i=0; i < table->capacity; i++){
+    for (int i=0; i < table->capacity; i++){
         if(!table){
             return false;
         }else{
@@ -364,24 +524,53 @@ bool HashTable<Key, T>::empty(){
 
 template<typename Key, typename T>
 int HashTable<Key, T>::loadFactor(){
-    return lenght() / table->capacity;
+    return length() / table->capacity;
 }
+
+template<typename Key, typename T>
+T HashTable<Key, T>::findItemFromKey(Key key) {
+    long unsigned int index = hash(key);
+    List<Pair<Key, T>>& target = table[index];
+    ListNavigator<Pair<Key, T>> nav = target.getListNavigator();
+    Pair<Key, T> currentItem;
+    while (!nav.end()) {
+        currentItem = nav.getCurrentItem();
+        if (currentItem.getFirst() == key) {
+            return currentItem.getLast();
+        }
+        nav.next();
+    }
+    return T();
+}
+    
 
 //Transforma a chave para um index da tabela
 template<typename Key, typename T>
-int HashTable<Key, T>::hash(Key key){
-    return (key % table->capacity);
+long unsigned int HashTable<Key, T>::hash(const Key& key) {
+    long unsigned int hashValue = 0;
+    long unsigned int n = key.length();
+    for (size_t i = 0; i < n; ++i) {
+        hashValue += key[i] * static_cast<size_t>(pow(128, n - i - 1));
+        hashValue %= this->getSize(); // Aplica o modulo a cada iteracao
+    }
+    return hashValue;
 }
 
 
 
 
-
-
-
-
-
-
+//criador de instancia da hashtable de dicionario alien usando o conversor de substrings
+HashTable<string, string> createAlienDict(int hashsize) {
+    //cout << "tentando criar a coisa" << endl;
+    HashTable<string, string> alienDict(hashsize);
+    string keys[29] = {":::",".::",":.:","::.",":..",".:.","..:","...","|::",":|:","::|","|.:",".|:",".:|","|:.",":|.",":.|","|..",".|.","..|",".||","|.|","||.","-.-",".--","--.","---","~",":__"};
+    for (int i = 0; i < 29; i++) {
+        //cout << "adicionando par de simbolo e letra na coisa" << endl;
+        alienDict.insert(keys[i], algoritmoConcersorAlienAlfanumerico(keys[i]));
+        //cout << "adicionado" << endl;
+    }
+    return alienDict;
+}
 
 
 
@@ -538,7 +727,7 @@ void codeExecutionStacker(List<string> codeList) {
 
     printSecretCode(lettersQueue);
 }
-
+/*
 int main() {
     List<string> codeList;
     string line;
@@ -551,7 +740,16 @@ int main() {
 
     return 0;
 }
+*/
 
+int main() {
+    HashTable<string, string> alienDict = createAlienDict(10);
+    cout << "Tabela Hash criada com sucesso!" << endl << endl;
+    cout << "Traduzindo ':::' : " << alienDict.findItemFromKey(":::") << endl;
+    cout << "Traduzindo '.::' : " << alienDict.findItemFromKey(".::") << endl;
+    cout << "Traduzindo ':.:' : " << alienDict.findItemFromKey(":.:") << endl;
+    cout << "Traduzindo '::.' : " << alienDict.findItemFromKey("::.") << endl;
+}
 
 
 /*
