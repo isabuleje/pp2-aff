@@ -573,8 +573,33 @@ HashTable<string, string> createAlienDict(int hashsize) {
 }
 
 
+//chamar essa funcao com a string de codigo alien e o DICIONARIO COMPLETO
+//O CRIADO PELA FUNCAO DE CRIAR TABELA HASH DE DICIONARIO COMPLETO
+//ex: 
+//HashTable<string, string> alienDict = createAlienDict(10);
+//translateString("------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.:.:", alienDict)
+//translateString retorna "    DEBCBCBADAAAAAGBCGDC"
+string translateString(string str, HashTable<string, string> alienDict) {
+    int strlen = str.length();
+    int overflowlen = strlen % 3;
+    strlen = strlen - overflowlen;
 
+    string result = "";
 
+    for (int i = 0; i < strlen; i += 3) {
+        string key = str.substr(i, 3);
+        string value = alienDict.findItemFromKey(key);
+        result += value;
+    }
+
+    if (overflowlen > 0) {
+        string key = str.substr(strlen, overflowlen);
+        string value = alienDict.findItemFromKey(key);
+        result += value;
+    }
+
+    return result;
+}
 
 
 
@@ -745,12 +770,13 @@ int main() {
 int main() {
     HashTable<string, string> alienDict = createAlienDict(10);
     cout << "Tabela Hash criada com sucesso!" << endl << endl;
-    cout << "Traduzindo ':::' : " << alienDict.findItemFromKey(":::") << endl;
-    cout << "Traduzindo '.::' : " << alienDict.findItemFromKey(".::") << endl;
-    cout << "Traduzindo ':.:' : " << alienDict.findItemFromKey(":.:") << endl;
-    cout << "Traduzindo '::.' : " << alienDict.findItemFromKey("::.") << endl;
+    string str1 = "|:.|.::::---.::|:..|:---::.|::::::__";
+    string str2 = "------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.:.:";
+    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl; 
+    cout << translateString(str1, alienDict) << endl;
+    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str2 << " a seguir:" << endl;
+    cout << translateString(str2, alienDict) << endl;
 }
-
 
 /*
 C :
