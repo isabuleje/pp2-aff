@@ -4,6 +4,7 @@
 #include <iostream>
 #include <list>
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
@@ -429,7 +430,42 @@ string algoritmoConcersorAlienAlfanumerico(string alien) {
     }
 }
 
+string algorimtoConversosSoQueComLista(string alien){
+    List<string> alienLetters;
+    List<string> humanLetters;
 
+    vector<string> vectorHumanLetters = {"A","B", "C", "D", "E",
+        "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+        "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+    };
+
+    vector<string> vectorAlienLetters = {":::", ".::", ":.:", "::."};
+
+    for (const auto& letter : vectorHumanLetters) {
+        humanLetters.insertBack(letter);
+    }
+
+    for (const auto& letter : vectorAlienLetters) {
+        alienLetters.insertBack(letter);
+    }
+
+
+    ListNavigator<string> navAlien = alienLetters.getListNavigator();
+    ListNavigator<string> navHuman = humanLetters.getListNavigator();
+
+    while (!navAlien.end()) {
+        if (alien == navAlien.getCurrentItem()) {
+            return navHuman.getCurrentItem();
+
+        }
+        navAlien.next();
+        navHuman.next();
+    }
+    return "Não achou aff";
+}
+
+
+//class HashTable
 template<typename Key, typename T> 
 class HashTable {
 private:
@@ -446,9 +482,7 @@ public:
     bool remove(Key key);
     bool search(Key key, T item);
     T findItemFromKey(Key key);
-    int length();
     bool empty();
-    int loadFactor();
     long unsigned int hash(const Key& key);
 };
 
@@ -527,10 +561,6 @@ bool HashTable<Key, T>::empty(){
     }
 }
 
-template<typename Key, typename T>
-int HashTable<Key, T>::loadFactor(){
-    return length() / table->capacity;
-}
 
 template<typename Key, typename T>
 T HashTable<Key, T>::findItemFromKey(Key key) {
@@ -763,8 +793,8 @@ void codeExecutionStacker(List<string> codeList) {
 
     printSecretCode(lettersQueue);
 }
-/*
-int main() {
+
+/*int main() {
     List<string> codeList;
     string line;
 
@@ -775,8 +805,8 @@ int main() {
     codeExecutionStacker(codeList);
 
     return 0;
-}
-*/
+}*/
+
 
 int main() {
     HashTable<string, string> alienDict = createAlienDict(10);
