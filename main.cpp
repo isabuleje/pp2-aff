@@ -58,7 +58,6 @@ public:
     int size();
     bool empty();
     List();
-    ~List();
     Node<T>* getHead();
 };
 
@@ -69,18 +68,6 @@ template<typename T> List<T>::List()
     pHead->next = nullptr;
     numItems = 0;
 }
-
-
-template<typename T> List<T>::~List() 
-{
-    while (empty() == false) {
-        removeFront();
-    }
-    delete pHead;
-    delete pBack;
-}
-
-
 
 template<typename T> void List<T>::succ(Node<T> *&p) { p = p->next; }
 
@@ -734,7 +721,6 @@ void translateAlien(List<string> alienList) {
     while (!nav.end()){
         nav.getCurrentItem(line);
         string translated = translateString(line, alienDict);
-        cout << translated << endl;
         result.insertBack(translated);
 
         nav.next();
