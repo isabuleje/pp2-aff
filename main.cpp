@@ -56,14 +56,15 @@ public:
     void removeFront();
     void removeBack();
     T getItemFront();
-    Node<T>* getHead();
     T getItemBack();
     ListNavigator<T> getListNavigator() const;
-    int size() const;
-    int safeSize() const;
+    int size();
+    //int safeSize()const;
     bool empty();
     List();
-    ~List();
+    //~List();
+    Node<T>* getHead();
+    //int safeSize() const;
 };
 
 template<typename T> List<T>::List() 
@@ -74,6 +75,7 @@ template<typename T> List<T>::List()
     numItems = 0;
 }
 
+/*
 template<typename T> List<T>::~List() 
 {
     while (empty() == false) {
@@ -82,22 +84,32 @@ template<typename T> List<T>::~List()
     delete pHead;
     delete pBack;
 }
+*/
 
-template<typename T> void List<T>::succ(Node<T> *&p) {
+/*template<typename T> void List<T>::succ(Node<T> *&p) {
     if (p -> next == nullptr || p -> next == pBack) {
       return;
     } else {
       p = p->next;
     }
-}
+}*/
+template<typename T> void List<T>::succ(Node<T> *&p) { p = p->next; }
 
-template<typename T> void List<T>::pred(Node<T> *&p) 
+/*template<typename T> void List<T>::pred(Node<T> *&p)
 {
     if (p -> prev == nullptr || p -> prev == pHead) {
       return;
     } else {
       p = p->prev;
     }
+}*/
+template<typename T> void List<T>::pred(Node<T> *&p)
+{
+    Node<T> *q = pHead;
+    while (q->next != p) {
+        succ(q);
+    }
+    p = q;
 }
 
 template<typename T> void List<T>::insertFront(T item) 
@@ -140,7 +152,7 @@ template<typename T> void List<T>::removeFront()
     numItems--;
 }
 
-template<typename T> void List<T>::removeBack() 
+/*template<typename T> void List<T>::removeBack()
 {
     if (empty()) {
       cout << "List is empty" << endl;
@@ -151,6 +163,23 @@ template<typename T> void List<T>::removeBack()
     pBack->next = nullptr;
 
     delete temp;
+    numItems--;
+}*/
+template<typename T> void List<T>::removeBack()
+{
+    if (empty()) {
+        cout << "List is empty" << endl;
+    }
+
+    Node<T> *temp = pBack;
+    pred(pBack);
+    pBack->next = nullptr;
+
+    delete temp;
+
+    if (pHead == pBack) {
+        pHead = pBack;
+    }
     numItems--;
 }
 
@@ -177,11 +206,11 @@ template<typename T> ListNavigator<T> List<T>::getListNavigator() const
     return ListNavigator<T>(pHead->next);
 }
 
-template<typename T> int List<T>::size() const { 
+template<typename T> int List<T>::size(){
     return numItems; 
 }
 
-template<typename T> int List<T>::safeSize() const 
+/*template<typename T> int List<T>::safeSize() const
 {
     Node<T>* Current = pHead->next;
     int count = 0;
@@ -194,7 +223,7 @@ template<typename T> int List<T>::safeSize() const
         }
     }
     return count;
-}
+}*/
 
 template<typename T> bool List<T>::empty() { return pBack == pHead; }
 
@@ -213,7 +242,7 @@ public:
     void reset();
     bool getCurrentItem(T &item);
     int  getCurrentPosition() const;
-    void removeCurrentItem();
+    //void removeCurrentItem();
     ListNavigator(Node<T> *current);
     T getCurrentItem();
     Node<T> *getCurrentNode() { return current; }
@@ -227,10 +256,8 @@ template<typename T> ListNavigator<T>::ListNavigator(Node<T> *current)
 
 template<typename T> bool ListNavigator<T>::end() { return current == nullptr; }
 
-template<typename T> void ListNavigator<T>::next() { 
-    if (current != nullptr) {
+template<typename T> void ListNavigator<T>::next() {
         current = current->next;
-    }
 }
 
 template<typename T> void ListNavigator<T>::reset() { current = start; }
@@ -248,7 +275,7 @@ template<typename T> T ListNavigator<T>::getCurrentItem() { return current->getI
 
 template<typename T> int ListNavigator<T>::getCurrentPosition() const { return currentPosition; }
 
-template<typename T> void ListNavigator<T>::removeCurrentItem() 
+/*template<typename T> void ListNavigator<T>::removeCurrentItem()
 {
     if (current == nullptr) {
       return;
@@ -262,7 +289,7 @@ template<typename T> void ListNavigator<T>::removeCurrentItem()
     }
     delete current;   
     this->reset();
-}
+}*/
 
 //Class Queue
 template<typename T> class Queue {
@@ -403,75 +430,8 @@ Pair<T, U>::Pair() {
     last = U();
 }
 
-//conversor das letras aliens pra alfabeto da forma mais literal possivel
-//(switchcase nao funciona com string, so com char)
-//(tem alguma outra forma de fazer isso?)
-/*
-string algoritmoConcersorAlienAlfanumerico(string alien) {
-    if (alien == ":::") {
-        return "A";
-    } else if (alien == ".::") {
-        return "B";
-    } else if (alien == ":.:") {
-        return "C";
-    } else if (alien == "::.") {
-        return "D";
-    } else if (alien == ":..") {
-        return "E";
-    } else if (alien == ".:.") {
-        return "F";
-    } else if (alien == "..:") {
-        return "G";
-    } else if (alien == "...") {
-        return "H";
-    } else if (alien == "|::") {
-        return "I";
-    } else if (alien == ":|:") {
-        return "J";
-    } else if (alien == "::|") {
-        return "K";
-    } else if (alien == "|.:") {
-        return "L";
-    } else if (alien == ".|:") {
-        return "M";
-    } else if (alien == ".:|") {
-        return "N";
-    } else if (alien == "|:.") {
-        return "O";
-    } else if (alien == ":|.") {
-        return "P";
-    } else if (alien == ":.|") {
-        return "Q";
-    } else if (alien == "|..") {
-        return "R";
-    } else if (alien == ".|.") {
-        return "S";
-    } else if (alien == "..|") {
-        return "T";
-    } else if (alien == ".||") {
-        return "U";
-    } else if (alien == "|.|") {
-        return "V";
-    } else if (alien == "||.") {
-        return "W";
-    } else if (alien == "-.-") {
-        return "X";
-    } else if (alien == ".--") {
-        return "Y";
-    } else if (alien == "--.") {
-        return "Z";
-    } else if (alien == "---") {
-        return " ";
-    } else if (alien == "~") {
-        return "~";
-    } else if (alien == ":__") {
-        return "|__";
-    } else {
-        return "?";
-    }
-}
-*/
-string algorimtoConversosSoQueComLista(string alien){
+
+string algorithmConvetor(string alien){
     List<string> alienLetters;
     List<string> humanLetters;
 
@@ -507,7 +467,6 @@ string algorimtoConversosSoQueComLista(string alien){
         navHuman.next();
     }
     return "?";
-    //return "Não achou aff";
 }
 
 
@@ -517,7 +476,7 @@ class HashTable {
 private:
     List<Pair<Key, T>> *table;
 public:
-    HashTable(const int capacity); //n sei se e assim q faz o construtor
+    HashTable(const int capacity);
     long unsigned int size;
 
     ~HashTable();
@@ -659,7 +618,7 @@ HashTable<string, string> createAlienDict(int hashsize) {
     string keys[29] = {":::",".::",":.:","::.",":..",".:.","..:","...","|::",":|:","::|","|.:",".|:",".:|","|:.",":|.",":.|","|..",".|.","..|",".||","|.|","||.","-.-",".--","--.","---","~",":__"};
     for (int i = 0; i < 29; i++) {
         //cout << "adicionando par de simbolo e letra na coisa" << endl;
-        alienDict.insert(keys[i], algorimtoConversosSoQueComLista(keys[i]));
+        alienDict.insert(keys[i], algorithmConvetor(keys[i]));
         //cout << "adicionado" << endl;
     }
     return alienDict;
@@ -677,8 +636,7 @@ string translateString(string str, const HashTable<string, string>& alienDict) {
     int overflowlen = strlen % 3;
     strlen = strlen - overflowlen;
 
-
-    string result = "";
+    string result;
 
     for (int i = 0; i < strlen; i += 3) {
         string key = str.substr(i, 3);
@@ -694,15 +652,11 @@ string translateString(string str, const HashTable<string, string>& alienDict) {
         result += key;
     }
 
+
     return result;
 }
 
 
-
-
-
-
-//NAO MEXE AQ PRA BAIXO Q TA PRONTO D:
 
 
 
@@ -817,7 +771,7 @@ bool executeFunctionByName(string functionName, List<string>& codeList, Queue<st
     ListNavigator<string> nav = codeList.getListNavigator();
     string line;
 
-    while (nav.getCurrentNode()->next != nullptr && !nav.end()) {
+    while (!nav.end()) {
         nav.getCurrentItem(line);
         line = trim(line);
         if (line == functionName + " :") {
@@ -837,7 +791,7 @@ bool executeFunctionByName(string functionName, List<string>& codeList, Queue<st
 void codeExecutionStacker(List<string> codeList) {
     List<string> queueList;
     Queue<string> lettersQueue(queueList);
-    
+
     List<string> callList;
     Stack<string> callStack(callList);
 
@@ -849,33 +803,44 @@ void codeExecutionStacker(List<string> codeList) {
     printSecretCode(lettersQueue);
 }
 
-/*int main() {
-    List<string> codeList;
+//Esse é o "principal" que leva pra execucao do codigo ja traduzido(?)
+void translateAlien(List<string> alienList) {
+    List<string> result;
     string line;
 
-    while (getline(cin, line) && line != "~") {
-      codeList.insertBack(line);
+
+    HashTable<string, string> alienDict = createAlienDict(11);
+
+
+    ListNavigator<string> nav = alienList.getListNavigator();
+
+    while (!nav.end()){
+        nav.getCurrentItem(line);
+        string translated = translateString(line, alienDict);
+        cout << "Traduzindo: " << translated << endl;
+        result.insertBack(translated);
+
+        nav.next();
     }
 
-    codeExecutionStacker(codeList);
-
-    return 0;
-}*/
+    codeExecutionStacker(result);
+}
 
 
+/*
 int main() {
     HashTable<string, string> alienDict = createAlienDict(2);
     cout << "Tabela Hash criada com sucesso!" << endl << endl;
     string str1 = "|:.|.::::---.::|:..|:---::.|::::::";
     string str2 = "------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.";
-    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl; 
+    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl;
     cout << translateString(str1, alienDict) << endl;
-    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl; 
+    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl;
     cout << translateString(str1, alienDict) << endl;
     cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str2 << " a seguir:" << endl;
     cout << translateString(str2, alienDict) << endl << endl;
 
-    cout << "usando a tabela hash pra traduzir esse comentario gigante aqui embaixo:" << endl;
+cout << "usando a tabela hash pra traduzir esse comentario gigante aqui embaixo:" << endl;
     cout << translateString(":.:---:", alienDict) << endl;
     cout << translateString("------:...:|.:.|::|.::..|::|..:::---..|", alienDict) << endl;
     cout << translateString("------:...:|.:.|::|.::..|::|..:::---:::", alienDict) << endl;
@@ -898,6 +863,31 @@ int main() {
     cout << translateString("------:...:|.:.|::|.::..|::|..:::---:..", alienDict) << endl;
     cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
 
+}*/
+/*int main() {
+    List<string> codeList;
+    string line;
+
+    while (getline(cin, line) && line != "~") {
+        codeList.insertBack(line);
+    }
+
+    codeExecutionStacker(codeList);
+
+    return 0;
+}*/
+
+int main() {
+    string line;
+    List<string> alienList;
+
+    while (getline(cin, line)) {
+        if (line == "~") break;
+        alienList.insertBack(line);
+    }
+
+    translateAlien(alienList);
+    return 0;
 }
 /*
 :.:---:
