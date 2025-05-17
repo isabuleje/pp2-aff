@@ -406,6 +406,7 @@ Pair<T, U>::Pair() {
 //conversor das letras aliens pra alfabeto da forma mais literal possivel
 //(switchcase nao funciona com string, so com char)
 //(tem alguma outra forma de fazer isso?)
+/*
 string algoritmoConcersorAlienAlfanumerico(string alien) {
     if (alien == ":::") {
         return "A";
@@ -469,17 +470,21 @@ string algoritmoConcersorAlienAlfanumerico(string alien) {
         return "?";
     }
 }
-
+*/
 string algorimtoConversosSoQueComLista(string alien){
     List<string> alienLetters;
     List<string> humanLetters;
 
     vector<string> vectorHumanLetters = {"A","B", "C", "D", "E",
         "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
-        "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+        "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", " ", "~", ":"
     };
 
-    vector<string> vectorAlienLetters = {":::", ".::", ":.:", "::."};
+    vector<string> vectorAlienLetters = {
+    ":::",".::",":.:","::.",":..",".:.","..:","...","|::",":|:","::|",
+    "|.:",".|:",".:|","|:.",":|.",":.|","|..",".|.","..|",".||","|.|",
+    "||.","-.-",".--","--.","---","~",":"
+    };
 
     for (const auto& letter : vectorHumanLetters) {
         humanLetters.insertBack(letter);
@@ -501,7 +506,8 @@ string algorimtoConversosSoQueComLista(string alien){
         navAlien.next();
         navHuman.next();
     }
-    return "Não achou aff";
+    return "?";
+    //return "Não achou aff";
 }
 
 
@@ -653,7 +659,7 @@ HashTable<string, string> createAlienDict(int hashsize) {
     string keys[29] = {":::",".::",":.:","::.",":..",".:.","..:","...","|::",":|:","::|","|.:",".|:",".:|","|:.",":|.",":.|","|..",".|.","..|",".||","|.|","||.","-.-",".--","--.","---","~",":__"};
     for (int i = 0; i < 29; i++) {
         //cout << "adicionando par de simbolo e letra na coisa" << endl;
-        alienDict.insert(keys[i], algoritmoConcersorAlienAlfanumerico(keys[i]));
+        alienDict.insert(keys[i], algorimtoConversosSoQueComLista(keys[i]));
         //cout << "adicionado" << endl;
     }
     return alienDict;
@@ -682,10 +688,10 @@ string translateString(string str, const HashTable<string, string>& alienDict) {
         result += value;
     }
 
-    if (overflowlen > 0) {
-        string key = str.substr(strlen, overflowlen);
+    if (overflowlen == 1) {
+        string key = str.substr(strlen, 1);
         string value = alienDict.findItemFromKey(key);
-        result += value;
+        result += key;
     }
 
     return result;
@@ -860,7 +866,7 @@ void codeExecutionStacker(List<string> codeList) {
 int main() {
     HashTable<string, string> alienDict = createAlienDict(2);
     cout << "Tabela Hash criada com sucesso!" << endl << endl;
-    string str1 = "|:.|.::::---.::|:..|:---::.|::::::__";
+    string str1 = "|:.|.::::---.::|:..|:---::.|::::::";
     string str2 = "------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.";
     cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl; 
     cout << translateString(str1, alienDict) << endl;
