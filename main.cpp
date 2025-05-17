@@ -511,7 +511,7 @@ template<typename Key, typename T>
 void HashTable<Key, T>::insert(Key key, T item){
     //cout << "entrou na funcao insert" << endl;
     long unsigned int index = hash(key);
-    cout << "index: " << index << endl;
+
     table[index].insertBack(Pair<Key, T>(key, item));
 }
 
@@ -732,8 +732,9 @@ void processFunctionBody(ListNavigator<string>& nav, Queue<string>& lettersQueue
 
     while (!nav.end()) {
         nav.getCurrentItem(line);
-        line = trim(line);
 
+        string originalLine = line;
+        line = trim(line);
         if (line == "~" || line.empty()) {
             break;  
         }
@@ -742,19 +743,26 @@ void processFunctionBody(ListNavigator<string>& nav, Queue<string>& lettersQueue
         if (line.find("DESENFILEIRA") != string::npos) {
             if (!lettersQueue.empty()) {
                 string value = lettersQueue.front();
-                cout << "DESENFILEIRA: " << value << endl;
+
                 lettersQueue.dequeue();
             }
         }
-        else if (line.find("ENFILEIRA") != string::npos) {
+        else if (line.find("ENFILEIRA") != string::npos){
+            string after = originalLine.substr(11);
+            after = trim(after);
+
+            if (after.empty()) {
+                lettersQueue.enqueue(" ");
+            } else {
+
                 string character = line.substr(line.find("ENFILEIRA") + 9);
                 character = trim(character);
                 lettersQueue.enqueue(character);
-                cout << "ENFILEIRA: " << character << endl;
             }
+
+        }
         else if (isCodeFunction(line)) {
             if (callStack.contains(line)) {
-                cout << "Ta repetindor na funcaor " << line << endl;
                 return;
             }
             
@@ -775,7 +783,6 @@ bool executeFunctionByName(string functionName, List<string>& codeList, Queue<st
         nav.getCurrentItem(line);
         line = trim(line);
         if (line == functionName + " :") {
-            cout << "chama" << line << endl;
             nav.next();
             callStack.push(line);
             processFunctionBody(nav, lettersQueue, codeList, callStack);
@@ -803,21 +810,18 @@ void codeExecutionStacker(List<string> codeList) {
     printSecretCode(lettersQueue);
 }
 
-//Esse é o "principal" que leva pra execucao do codigo ja traduzido(?)
 void translateAlien(List<string> alienList) {
     List<string> result;
     string line;
 
-
     HashTable<string, string> alienDict = createAlienDict(11);
-
 
     ListNavigator<string> nav = alienList.getListNavigator();
 
     while (!nav.end()){
         nav.getCurrentItem(line);
         string translated = translateString(line, alienDict);
-        cout << "Traduzindo: " << translated << endl;
+        cout << translated << endl;
         result.insertBack(translated);
 
         nav.next();
@@ -826,56 +830,6 @@ void translateAlien(List<string> alienList) {
     codeExecutionStacker(result);
 }
 
-
-/*
-int main() {
-    HashTable<string, string> alienDict = createAlienDict(2);
-    cout << "Tabela Hash criada com sucesso!" << endl << endl;
-    string str1 = "|:.|.::::---.::|:..|:---::.|::::::";
-    string str2 = "------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.";
-    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl;
-    cout << translateString(str1, alienDict) << endl;
-    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl;
-    cout << translateString(str1, alienDict) << endl;
-    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str2 << " a seguir:" << endl;
-    cout << translateString(str2, alienDict) << endl << endl;
-
-cout << "usando a tabela hash pra traduzir esse comentario gigante aqui embaixo:" << endl;
-    cout << translateString(":.:---:", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---..|", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:::", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:.|", alienDict) << endl;
-    cout << translateString(":::---:", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:::", alienDict) << endl;
-    cout << translateString("------:.:", alienDict) << endl;
-    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
-    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---.||", alienDict) << endl;
-    cout << translateString(".::---:", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:::", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---..|", alienDict) << endl;
-    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
-    cout << translateString("------:::", alienDict) << endl;
-    cout << translateString("--.---:", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::----.-", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:.|", alienDict) << endl;
-    cout << translateString("------.::", alienDict) << endl;
-    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:..", alienDict) << endl;
-    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
-
-}*/
-/*int main() {
-    List<string> codeList;
-    string line;
-
-    while (getline(cin, line) && line != "~") {
-        codeList.insertBack(line);
-    }
-
-    codeExecutionStacker(codeList);
-
-    return 0;
-}*/
 
 int main() {
     string line;
@@ -889,55 +843,3 @@ int main() {
     translateAlien(alienList);
     return 0;
 }
-/*
-:.:---:
-------:...:|.:.|::|.::..|::|..:::---..|
-------:...:|.:.|::|.::..|::|..:::---:::
-------:...:|.:.|::|.::..|::|..:::---:.|
-:::---:
-------:...:|.:.|::|.::..|::|..:::---:::
-------:.:
-------::.:...|.:...:|.:.|::|.::..|::|..:::
-------::.:...|.:...:|.:.|::|.::..|::|..:::
-------:...:|.:.|::|.::..|::|..:::---.||
-.::---:
-------:...:|.:.|::|.::..|::|..:::---:::
-------:...:|.:.|::|.::..|::|..:::---..|
-------::.:...|.:...:|.:.|::|.::..|::|..:::
-------:::
---.---:
-------:...:|.:.|::|.::..|::|..:::----.-
-------:...:|.:.|::|.::..|::|..:::---:.|
-------.::
-------:...:|.:.|::|.::..|::|..:::---:..
-------::.:...|.:...:|.:.|::|.::..|::|..:::
-~
-*/
-
-/*
-C :
-    ENFILEIRA T
-    ENFILEIRA A
-    ENFILEIRA Q
-A :
-    ENFILEIRA A
-    C
-    DESENFILEIRA
-    DESENFILEIRA
-    ENFILEIRA U
-B :
-    ENFILEIRA A
-    ENFILEIRA T
-    DESENFILEIRA
-    A
-Z :
-    ENFILEIRA X
-    ENFILEIRA Q
-    B
-    ENFILEIRA E
-    DESENFILEIRA
-~
-*/
-
-//mds deu certo...
-
