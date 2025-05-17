@@ -59,9 +59,11 @@ public:
     Node<T>* getHead();
     T getItemBack();
     ListNavigator<T> getListNavigator() const;
-    int size();
+    int size() const;
+    int safeSize() const;
     bool empty();
     List();
+    ~List();
 };
 
 template<typename T> List<T>::List() 
@@ -70,6 +72,15 @@ template<typename T> List<T>::List()
     pBack = pHead;
     pHead->next = nullptr;
     numItems = 0;
+}
+
+template<typename T> List<T>::~List() 
+{
+    while (empty() == false) {
+        removeFront();
+    }
+    delete pHead;
+    delete pBack;
 }
 
 template<typename T> void List<T>::succ(Node<T> *&p) {
@@ -115,6 +126,7 @@ template<typename T> void List<T>::removeFront()
 {
     if (empty()) {
       cout << "List is empty" << endl;
+      return;
     }
 
     Node<T> *temp = pHead->next;
@@ -165,7 +177,24 @@ template<typename T> ListNavigator<T> List<T>::getListNavigator() const
     return ListNavigator<T>(pHead->next);
 }
 
-template<typename T> int List<T>::size() { return numItems; }
+template<typename T> int List<T>::size() const { 
+    return numItems; 
+}
+
+template<typename T> int List<T>::safeSize() const 
+{
+    Node<T>* Current = pHead->next;
+    int count = 0;
+    while (true) {
+        if (Current == nullptr) {
+            break;
+        } else {
+            count++;
+            Current = Current->next;
+        }
+    }
+    return count;
+}
 
 template<typename T> bool List<T>::empty() { return pBack == pHead; }
 
@@ -223,10 +252,16 @@ template<typename T> void ListNavigator<T>::removeCurrentItem()
 {
     if (current == nullptr) {
       return;
+    } else if (current->prev == nullptr) {
+        current->next->prev = nullptr;
+    } else if (current->next == nullptr) {
+        current->prev->next = nullptr;
+    } else {
+        current->prev->next = current->next;
+        current->next->prev = current->prev;
     }
-    current->prev->next = current->next;
-    current->next->prev = current->prev;
     delete current;   
+    this->reset();
 }
 
 //Class Queue
@@ -481,14 +516,14 @@ public:
 
     ~HashTable();
 
-    long unsigned int getSize();
+    long unsigned int getSize() const;
     void insert(Key key, T item);
     void insert(Pair<Key, T> pair); 
     bool remove(Key key);
     bool search(Key key, T item);
-    T findItemFromKey(Key key);
+    T findItemFromKey(Key key) const;
     bool empty();
-    long unsigned int hash(const Key& key);
+    long unsigned int hash(const Key& key) const;
 };
 
 template<typename Key, typename T>
@@ -503,7 +538,7 @@ HashTable<Key, T>::~HashTable(){
 }
 
 template<typename Key, typename T>
-long unsigned int HashTable<Key, T>::getSize(){
+long unsigned int HashTable<Key, T>::getSize() const{
     return size;
 }
 
@@ -568,39 +603,50 @@ bool HashTable<Key, T>::empty(){
 
 
 template<typename Key, typename T>
-T HashTable<Key, T>::findItemFromKey(Key key) {
-    cout << "entrou na funcao findItemFromKey" << endl;
+T HashTable<Key, T>::findItemFromKey(Key key) const {
+    //cout << "entrou na funcao findItemFromKey" << endl;
     long unsigned int index = hash(key);
-    List<Pair<Key, T>>& target = table[index];
-    cout << "index: " << index << endl;
+    //List<Pair<Key, T>>& target = table[index];
+    //cout << "index: " << index << endl;
     Node<Pair<Key, T>>* currentNode  = table[index].getHead();
-    cout << "tamanho da lista: " << target.size() << endl;
-    do {
+    //cout << "tamanho da lista usando size: " << target.size() << endl;
+    //cout << "tamanho da lista usando safeSize: " << target.safeSize() << endl;
+    while (true) {
+        //cout << "sequencia do loop do while iniciada" << endl;
+        if (currentNode == nullptr || currentNode->next == nullptr) {
+            break;
+        }
         currentNode = currentNode->next;
+        //cout << "item foi avancado" << endl;
         if (currentNode->getItem().getFirst() == key) {
+            //cout << "encontrado" << endl;
             return currentNode->getItem().getLast();
         }
-    } while (currentNode != nullptr);
+        //cout << "nao encontrado" << endl;
+    }
+    //cout << "nao achou nada" << endl;
     return T();
 }
     
 
 //Transforma a chave para um index da tabela
 template<typename Key, typename T>
-long unsigned int HashTable<Key, T>::hash(const Key& key) {
+long unsigned int HashTable<Key, T>::hash(const Key& key) const{
     long unsigned int hashValue = 0;
     long unsigned int n = key.length();
     for (size_t i = 0; i < n; ++i) {
         hashValue += key[i] * static_cast<size_t>(pow(128, n - i - 1));
+        //cout << "hashValue: " << hashValue << endl;
         hashValue %= this->getSize(); // Aplica o modulo a cada iteracao
     }
-    return hashValue;
+    return hashValue;// %= this->getSize();
 }
 
 
 
 
 //criador de instancia da hashtable de dicionario alien usando o conversor de substrings
+//hashsize = tamanho da tabela, vai funcionar contanto que seja maior que 0
 HashTable<string, string> createAlienDict(int hashsize) {
     //cout << "tentando criar a coisa" << endl;
     HashTable<string, string> alienDict(hashsize);
@@ -620,18 +666,19 @@ HashTable<string, string> createAlienDict(int hashsize) {
 //HashTable<string, string> alienDict = createAlienDict(10);
 //translateString("------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.:.:", alienDict)
 //translateString retorna "    DEBCBCBADAAAAAGBCGDC"
-string translateString(string str, HashTable<string, string> alienDict) {
+string translateString(string str, const HashTable<string, string>& alienDict) {
     int strlen = str.length();
     int overflowlen = strlen % 3;
     strlen = strlen - overflowlen;
+
 
     string result = "";
 
     for (int i = 0; i < strlen; i += 3) {
         string key = str.substr(i, 3);
+        //cout << "key: " << key << endl;
         string value = alienDict.findItemFromKey(key);
-        cout << "key: " << key << endl;
-        cout << "value: " << value << endl;
+        //cout << "value: " << value << endl;
         result += value;
     }
 
@@ -811,14 +858,40 @@ void codeExecutionStacker(List<string> codeList) {
 
 
 int main() {
-    HashTable<string, string> alienDict = createAlienDict(10);
+    HashTable<string, string> alienDict = createAlienDict(2);
     cout << "Tabela Hash criada com sucesso!" << endl << endl;
     string str1 = "|:.|.::::---.::|:..|:---::.|::::::__";
-    string str2 = "------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.:.:";
+    string str2 = "------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.";
+    cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl; 
+    cout << translateString(str1, alienDict) << endl;
     cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str1 << " a seguir:" << endl; 
     cout << translateString(str1, alienDict) << endl;
     cout << "usando TABELA HASH MANEIRA DE ALIEN pra traduzir " << str2 << " a seguir:" << endl;
-    cout << translateString(str2, alienDict) << endl;
+    cout << translateString(str2, alienDict) << endl << endl;
+
+    cout << "usando a tabela hash pra traduzir esse comentario gigante aqui embaixo:" << endl;
+    cout << translateString(":.:---:", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---..|", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:::", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:.|", alienDict) << endl;
+    cout << translateString(":::---:", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:::", alienDict) << endl;
+    cout << translateString("------:.:", alienDict) << endl;
+    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
+    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---.||", alienDict) << endl;
+    cout << translateString(".::---:", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:::", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---..|", alienDict) << endl;
+    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
+    cout << translateString("------:::", alienDict) << endl;
+    cout << translateString("--.---:", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::----.-", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:.|", alienDict) << endl;
+    cout << translateString("------.::", alienDict) << endl;
+    cout << translateString("------:...:|.:.|::|.::..|::|..:::---:..", alienDict) << endl;
+    cout << translateString("------::.:...|.:...:|.:.|::|.::..|::|..:::", alienDict) << endl;
+
 }
 /*
 :.:---:
