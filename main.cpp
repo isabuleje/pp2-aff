@@ -8,9 +8,6 @@
 
 using namespace std;
 
-
-
-
 // Class Node
 template<typename T> class Node {
 private:
@@ -59,12 +56,10 @@ public:
     T getItemBack();
     ListNavigator<T> getListNavigator() const;
     int size();
-    //int safeSize()const;
     bool empty();
     List();
-    //~List();
+    ~List();
     Node<T>* getHead();
-    //int safeSize() const;
 };
 
 template<typename T> List<T>::List() 
@@ -75,7 +70,7 @@ template<typename T> List<T>::List()
     numItems = 0;
 }
 
-/*
+
 template<typename T> List<T>::~List() 
 {
     while (empty() == false) {
@@ -84,25 +79,12 @@ template<typename T> List<T>::~List()
     delete pHead;
     delete pBack;
 }
-*/
 
-/*template<typename T> void List<T>::succ(Node<T> *&p) {
-    if (p -> next == nullptr || p -> next == pBack) {
-      return;
-    } else {
-      p = p->next;
-    }
-}*/
+
+
 template<typename T> void List<T>::succ(Node<T> *&p) { p = p->next; }
 
-/*template<typename T> void List<T>::pred(Node<T> *&p)
-{
-    if (p -> prev == nullptr || p -> prev == pHead) {
-      return;
-    } else {
-      p = p->prev;
-    }
-}*/
+
 template<typename T> void List<T>::pred(Node<T> *&p)
 {
     Node<T> *q = pHead;
@@ -152,19 +134,7 @@ template<typename T> void List<T>::removeFront()
     numItems--;
 }
 
-/*template<typename T> void List<T>::removeBack()
-{
-    if (empty()) {
-      cout << "List is empty" << endl;
-    }
 
-    Node<T> *temp = pBack;
-    pred(pBack);
-    pBack->next = nullptr;
-
-    delete temp;
-    numItems--;
-}*/
 template<typename T> void List<T>::removeBack()
 {
     if (empty()) {
@@ -210,20 +180,6 @@ template<typename T> int List<T>::size(){
     return numItems; 
 }
 
-/*template<typename T> int List<T>::safeSize() const
-{
-    Node<T>* Current = pHead->next;
-    int count = 0;
-    while (true) {
-        if (Current == nullptr) {
-            break;
-        } else {
-            count++;
-            Current = Current->next;
-        }
-    }
-    return count;
-}*/
 
 template<typename T> bool List<T>::empty() { return pBack == pHead; }
 
@@ -242,7 +198,6 @@ public:
     void reset();
     bool getCurrentItem(T &item);
     int  getCurrentPosition() const;
-    //void removeCurrentItem();
     ListNavigator(Node<T> *current);
     T getCurrentItem();
     Node<T> *getCurrentNode() { return current; }
@@ -275,21 +230,6 @@ template<typename T> T ListNavigator<T>::getCurrentItem() { return current->getI
 
 template<typename T> int ListNavigator<T>::getCurrentPosition() const { return currentPosition; }
 
-/*template<typename T> void ListNavigator<T>::removeCurrentItem()
-{
-    if (current == nullptr) {
-      return;
-    } else if (current->prev == nullptr) {
-        current->next->prev = nullptr;
-    } else if (current->next == nullptr) {
-        current->prev->next = nullptr;
-    } else {
-        current->prev->next = current->next;
-        current->next->prev = current->prev;
-    }
-    delete current;   
-    this->reset();
-}*/
 
 //Class Queue
 template<typename T> class Queue {
@@ -476,7 +416,7 @@ class HashTable {
 private:
     List<Pair<Key, T>> *table;
 public:
-    HashTable(const int capacity);
+    HashTable(int capacity);
     long unsigned int size;
 
     ~HashTable();
@@ -492,7 +432,7 @@ public:
 };
 
 template<typename Key, typename T>
-HashTable<Key, T>::HashTable(const int capacity){
+HashTable<Key, T>::HashTable(int capacity){
     table = new List<Pair<Key, T>>[capacity];
     size = capacity;
 }
@@ -509,7 +449,6 @@ long unsigned int HashTable<Key, T>::getSize() const{
 
 template<typename Key, typename T>
 void HashTable<Key, T>::insert(Key key, T item){
-    //cout << "entrou na funcao insert" << endl;
     long unsigned int index = hash(key);
 
     table[index].insertBack(Pair<Key, T>(key, item));
@@ -569,42 +508,30 @@ bool HashTable<Key, T>::empty(){
 
 template<typename Key, typename T>
 T HashTable<Key, T>::findItemFromKey(Key key) const {
-    //cout << "entrou na funcao findItemFromKey" << endl;
     long unsigned int index = hash(key);
-    //List<Pair<Key, T>>& target = table[index];
-    //cout << "index: " << index << endl;
     Node<Pair<Key, T>>* currentNode  = table[index].getHead();
-    //cout << "tamanho da lista usando size: " << target.size() << endl;
-    //cout << "tamanho da lista usando safeSize: " << target.safeSize() << endl;
     while (true) {
-        //cout << "sequencia do loop do while iniciada" << endl;
         if (currentNode == nullptr || currentNode->next == nullptr) {
             break;
         }
         currentNode = currentNode->next;
-        //cout << "item foi avancado" << endl;
         if (currentNode->getItem().getFirst() == key) {
-            //cout << "encontrado" << endl;
             return currentNode->getItem().getLast();
         }
-        //cout << "nao encontrado" << endl;
     }
-    //cout << "nao achou nada" << endl;
     return T();
 }
     
 
-//Transforma a chave para um index da tabela
 template<typename Key, typename T>
 long unsigned int HashTable<Key, T>::hash(const Key& key) const{
     long unsigned int hashValue = 0;
     long unsigned int n = key.length();
     for (size_t i = 0; i < n; ++i) {
         hashValue += key[i] * static_cast<size_t>(pow(128, n - i - 1));
-        //cout << "hashValue: " << hashValue << endl;
-        hashValue %= this->getSize(); // Aplica o modulo a cada iteracao
+        hashValue %= this->getSize();
     }
-    return hashValue;// %= this->getSize();
+    return hashValue;
 }
 
 
@@ -613,13 +540,10 @@ long unsigned int HashTable<Key, T>::hash(const Key& key) const{
 //criador de instancia da hashtable de dicionario alien usando o conversor de substrings
 //hashsize = tamanho da tabela, vai funcionar contanto que seja maior que 0
 HashTable<string, string> createAlienDict(int hashsize) {
-    //cout << "tentando criar a coisa" << endl;
     HashTable<string, string> alienDict(hashsize);
     string keys[29] = {":::",".::",":.:","::.",":..",".:.","..:","...","|::",":|:","::|","|.:",".|:",".:|","|:.",":|.",":.|","|..",".|.","..|",".||","|.|","||.","-.-",".--","--.","---","~",":__"};
     for (int i = 0; i < 29; i++) {
-        //cout << "adicionando par de simbolo e letra na coisa" << endl;
         alienDict.insert(keys[i], algorithmConvetor(keys[i]));
-        //cout << "adicionado" << endl;
     }
     return alienDict;
 }
@@ -627,10 +551,6 @@ HashTable<string, string> createAlienDict(int hashsize) {
 
 //chamar essa funcao com a string de codigo alien e o DICIONARIO COMPLETO
 //O CRIADO PELA FUNCAO DE CRIAR TABELA HASH DE DICIONARIO COMPLETO
-//ex: 
-//HashTable<string, string> alienDict = createAlienDict(10);
-//translateString("------------::.:...:::.:.:::.:.:::::::.:::::::::::::::..:.:::.:..:::.:.:", alienDict)
-//translateString retorna "    DEBCBCBADAAAAAGBCGDC"
 string translateString(string str, const HashTable<string, string>& alienDict) {
     int strlen = str.length();
     int overflowlen = strlen % 3;
@@ -640,9 +560,7 @@ string translateString(string str, const HashTable<string, string>& alienDict) {
 
     for (int i = 0; i < strlen; i += 3) {
         string key = str.substr(i, 3);
-        //cout << "key: " << key << endl;
         string value = alienDict.findItemFromKey(key);
-        //cout << "value: " << value << endl;
         result += value;
     }
 
@@ -651,13 +569,8 @@ string translateString(string str, const HashTable<string, string>& alienDict) {
         string value = alienDict.findItemFromKey(key);
         result += key;
     }
-
-
     return result;
 }
-
-
-
 
 
 /*
