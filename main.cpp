@@ -14,6 +14,8 @@ private:
     T item;
 
 public:
+    Node<T>* left;
+    Node<T>* right;
     Node<T> *next;
     Node<T> *prev;
     T getItem();
@@ -308,6 +310,7 @@ bool Stack<T>::contains(T item) {
     return false;
 }
 
+
 //Classe Pair
 //basicamente classe de tupla tamanho 2, professor pediu pra uma nos casos de colisao
 template<typename T, typename U>
@@ -358,50 +361,13 @@ Pair<T, U>::Pair() {
 }
 
 
-string algorithmConvetor(string alien){
-    List<string> alienLetters;
-    List<string> humanLetters;
-
-    vector<string> vectorHumanLetters = {"A","B", "C", "D", "E",
-        "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
-        "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", " ", "~", ":"
-    };
-
-    vector<string> vectorAlienLetters = {
-    ":::",".::",":.:","::.",":..",".:.","..:","...","|::",":|:","::|",
-    "|.:",".|:",".:|","|:.",":|.",":.|","|..",".|.","..|",".||","|.|",
-    "||.","-.-",".--","--.","---","~",":"
-    };
-
-    for (const auto& letter : vectorHumanLetters) {
-        humanLetters.insertBack(letter);
-    }
-
-    for (const auto& letter : vectorAlienLetters) {
-        alienLetters.insertBack(letter);
-    }
-
-
-    ListNavigator<string> navAlien = alienLetters.getListNavigator();
-    ListNavigator<string> navHuman = humanLetters.getListNavigator();
-
-    while (!navAlien.end()) {
-        if (alien == navAlien.getCurrentItem()) {
-            return navHuman.getCurrentItem();
-
-        }
-        navAlien.next();
-        navHuman.next();
-    }
-    return "?";
-}
-
-
 //class HashTable
-template<typename Key, typename T> 
+template<typename Key, typename T>
 class HashTable {
 private:
     List<Pair<Key, T>> *table;
+    //Usar na PP3
+    //AVLTree<Pair<Key, T>> *table;
 public:
     HashTable(int capacity);
     long unsigned int size;
@@ -410,7 +376,7 @@ public:
 
     long unsigned int getSize() const;
     void insert(Key key, T item);
-    void insert(Pair<Key, T> pair); 
+    void insert(Pair<Key, T> pair);
     bool remove(Key key);
     bool search(Key key, T item);
     T findItemFromKey(Key key) const;
@@ -508,7 +474,7 @@ T HashTable<Key, T>::findItemFromKey(Key key) const {
     }
     return T();
 }
-    
+
 
 template<typename Key, typename T>
 long unsigned int HashTable<Key, T>::hash(const Key& key) const{
@@ -520,6 +486,156 @@ long unsigned int HashTable<Key, T>::hash(const Key& key) const{
     }
     return hashValue;
 }
+
+template<typename Key, typename T>
+class BinarySearchTree {
+private:
+    Node<T>* root;
+
+public:
+    BinarySearchTree();
+    ~BinarySearchTree();
+    void create();
+    void insert(Key key, T item);
+    bool remove(Key key);
+    bool search(Key key, T item);
+    void preorderTraversal();
+    void inorderTraversal();
+    void postorderTraversal();
+    void insert(T item, Node<T>* p);
+    void remove(T item, Node<T>* p);
+    void remove_aux(T item, Node<T>* p);
+    void search(T item, Node<T>* p);
+    void preorderTraversal(Node<T>* p);
+    void inorderTraversal(Node<T>* p);
+    void postorderTraversal(Node<T>* p);
+};
+
+template<typename Key, typename T>
+BinarySearchTree<Key, T>::BinarySearchTree() {
+    root = nullptr;
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::create() {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::insert(Key key, T item) {
+
+}
+
+template<typename Key, typename T>
+bool BinarySearchTree<Key, T>::remove(Key key) {
+
+}
+
+template<typename Key, typename T>
+bool BinarySearchTree<Key, T>::search(Key key, T item) {
+    if (root == NULL) return NULL;
+    Node<T> *aux = root;
+    while (aux->item != key) {
+        if (key < aux->item) {
+            aux = aux->left;
+        }else {
+
+        }
+    }
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::preorderTraversal() {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::inorderTraversal() {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::postorderTraversal() {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::insert(T item, Node<T> *p) {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::remove(T item, Node<T> *p) {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::remove_aux(T item, Node<T> *p) {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::search(T item, Node<T> *p) {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::preorderTraversal(Node<T> *p) {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::inorderTraversal(Node<T> *p) {
+
+}
+
+template<typename Key, typename T>
+void BinarySearchTree<Key, T>::postorderTraversal(Node<T> *p) {
+
+}
+
+
+
+
+
+string algorithmConvetor(string alien){
+    List<string> alienLetters;
+    List<string> humanLetters;
+
+    vector<string> vectorHumanLetters = {"A","B", "C", "D", "E",
+        "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+        "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", " ", "~", ":"
+    };
+
+    vector<string> vectorAlienLetters = {
+    ":::",".::",":.:","::.",":..",".:.","..:","...","|::",":|:","::|",
+    "|.:",".|:",".:|","|:.",":|.",":.|","|..",".|.","..|",".||","|.|",
+    "||.","-.-",".--","--.","---","~",":"
+    };
+
+    for (const auto& letter : vectorHumanLetters) {
+        humanLetters.insertBack(letter);
+    }
+
+    for (const auto& letter : vectorAlienLetters) {
+        alienLetters.insertBack(letter);
+    }
+
+
+    ListNavigator<string> navAlien = alienLetters.getListNavigator();
+    ListNavigator<string> navHuman = humanLetters.getListNavigator();
+
+    while (!navAlien.end()) {
+        if (alien == navAlien.getCurrentItem()) {
+            return navHuman.getCurrentItem();
+
+        }
+        navAlien.next();
+        navHuman.next();
+    }
+    return "?";
+}
+
 
 
 
